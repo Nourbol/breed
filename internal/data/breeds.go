@@ -10,3 +10,7 @@ type Breed struct {
 	AvgCost     Cost      `json:"avg_cost,omitempty"`
 	Version     int32     `json:"version"`
 }
+
+func ValidateBreed(v *validator.Validator, movie *Movie) {
+	//something
+}
