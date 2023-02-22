@@ -73,7 +73,7 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst any
 	if err != io.EOF {
 		return errors.New("body must only contain a single JSON value")
 	}
-  
+
 	return nil
 }
 
@@ -92,4 +92,6 @@ func (app *application) writeJSON(w http.ResponseWriter, status int, data envelo
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	w.Write(js)
+
+	return nil
 }

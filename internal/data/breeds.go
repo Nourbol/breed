@@ -1,6 +1,9 @@
 package data
 
-import "time"
+import (
+	"github.com/Nourbol/breed/internal/validator"
+	"time"
+)
 
 type Breed struct {
 	ID          int64     `json:"id"`
@@ -11,6 +14,11 @@ type Breed struct {
 	Version     int32     `json:"version"`
 }
 
-func ValidateBreed(v *validator.Validator, movie *Movie) {
-	//something
+func ValidateBreed(v *validator.Validator, breed *Breed) {
+	v.Check(breed.Name != "", "name", "must be provided")
+	v.Check(len(breed.Name) <= 500, "name", "must not be more than 500 bytes long")
+	v.Check(breed.Description != "", "descriptions", "must be provided")
+	v.Check(len(breed.Description) <= 1000, "description", "must not be more than 1000 bytes long")
+	v.Check(breed.AvgCost != 0, "avg_cost", "must be provided")
+	v.Check(breed.AvgCost > 0, "avg_cost", "must be a positive integer")
 }

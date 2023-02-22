@@ -14,7 +14,7 @@ func (app *application) routes() *httprouter.Router {
 
 	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler)
 	router.HandlerFunc(http.MethodPost, "/v1/breeds", app.createBreedHandler)
-	router.HandlerFunc(http.MethodGet, "/v1/breed/:id", app.showBreedHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/breeds/:id", app.showBreedHandler)
 
 	return router
 }
