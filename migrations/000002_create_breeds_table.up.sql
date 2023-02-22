@@ -4,5 +4,6 @@ CREATE TABLE IF NOT EXISTS breeds (
     name text NOT NULL,
     description text NOT NULL,
     avg_cost integer NOT NULL,
+    countries text[] NOT NULL,
     version integer NOT NULL DEFAULT 1
 );

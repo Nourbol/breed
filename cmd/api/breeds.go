@@ -13,6 +13,7 @@ func (app *application) createBreedHandler(w http.ResponseWriter, r *http.Reques
 		Name        string    `json:"name"`
 		Description string    `json:"description"`
 		AvgCost     data.Cost `json:"avg_cost"`
+		Countries   []string  `json:"countries"`
 	}
 
 	err := app.readJSON(w, r, &input)
@@ -25,6 +26,7 @@ func (app *application) createBreedHandler(w http.ResponseWriter, r *http.Reques
 		Name:        input.Name,
 		Description: input.Description,
 		AvgCost:     input.AvgCost,
+		Countries:   input.Countries,
 	}
 
 	v := validator.New()
@@ -49,6 +51,7 @@ func (app *application) showBreedHandler(w http.ResponseWriter, r *http.Request)
 		Name:        "Golden Retriever",
 		Description: "The Golden Retriever is a Scottish breed of retriever dog of medium size.",
 		AvgCost:     2250,
+		Countries:   []string{"England", "Scotland"},
 		Version:     1,
 	}
 
