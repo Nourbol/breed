@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/Nourbol/breed/internal/data"
 	"net/http"
+	"time"
 )
 
 func (app *application) createBreedHandler(w http.ResponseWriter, r *http.Request) {
@@ -12,8 +14,21 @@ func (app *application) createBreedHandler(w http.ResponseWriter, r *http.Reques
 func (app *application) showBreedHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := app.readIDParam(r)
 	if err != nil {
-		http.NotFound(w, r)
+		app.notFoundResponse(w, r)
 		return
 	}
-	fmt.Fprintf(w, "show the details of breed %d\n", id)
+
+	breed := data.Breed{
+		ID:          id,
+		CreatedAt:   time.Now(),
+		Name:        "  ",
+		Description: "",
+		AvgCost:     ' ',
+		Version:     ' ',
+	}
+
+	err = app.writeJSON(w, http.StatusOK, envelope{"breed": breed}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
 }
