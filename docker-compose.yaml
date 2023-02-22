@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  api:
+    container_name: breed-api
+    ports:
+      - "4000:4000"
+    build: .
+    depends_on:
+      - db
+    entrypoint: [ "go", "run", "./cmd/api",
+                  "-db-dsn=postgres://${DB_ROOT_USER}:${DB_ROOT_PASS}@db/breed" ]
+
+  db:
+    image: postgres:13.5
+    container_name: breed-db
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - breed:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: "breed"
+      POSTGRES_USER: "${DB_ROOT_USER}"
+      POSTGRES_PASSWORD: "${DB_ROOT_PASS}"
+
+  migrate:
+    image: migrate/migrate
+    container_name: breed-migrate
+    depends_on:
+      - db
+    restart: on-failure
+    volumes:
+      - ./migrations:/migrations
+    command: [ "-path", "/migrations", "-database",
+               "postgres://${DB_ROOT_USER}:${DB_ROOT_PASS}@db/breed?sslmode=disable", "up" ]
+
+volumes:
+  breed:

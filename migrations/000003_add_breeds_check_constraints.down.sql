@@ -1,0 +1,1 @@
+ALTER TABLE breeds DROP CONSTRAINT IF EXISTS breeds_avg_cost_check;
