@@ -3,11 +3,9 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"github.com/Nourbol/breed/internal/data"
 	"github.com/Nourbol/breed/internal/jsonlog"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"net/http"
 	"os"
 	"time"
 )
@@ -52,21 +50,12 @@ func main() {
 		logger: logger,
 		models: data.NewModels(db),
 	}
-	srv := &http.Server{
-		Addr:         fmt.Sprintf(":%d", cfg.port),
-		Handler:      app.routes(),
-		IdleTimeout:  time.Minute,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 30 * time.Second,
+
+	err = app.serve()
+	if err != nil {
+		logger.PrintFatal(err, nil)
 	}
 
-	logger.PrintInfo("starting server", map[string]string{
-		"addr": srv.Addr,
-		"env":  cfg.env,
-	})
-	err = srv.ListenAndServe()
-
-	logger.PrintFatal(err, nil)
 }
 
 func openDB(cfg config) (*pgxpool.Pool, error) {
