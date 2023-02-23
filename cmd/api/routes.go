@@ -19,5 +19,7 @@ func (app *application) routes() http.Handler {
 	router.HandlerFunc(http.MethodPatch, "/v1/breeds/:id", app.updateBreedHandler)
 	router.HandlerFunc(http.MethodDelete, "/v1/breeds/:id", app.deleteBreedHandler)
 
+	router.HandlerFunc(http.MethodPost, "/v1/users", app.registerUserHandler)
+
 	return app.recoverPanic(router)
 }
