@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"github.com/Nourbol/breed/internal/data"
 	"github.com/Nourbol/breed/internal/jsonlog"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"net/http"
 	"os"
 	"time"
@@ -15,6 +17,11 @@ const version = "1.0.0"
 type config struct {
 	port int
 	env  string
+	db   struct {
+		dsn         string
+		maxConns    int
+		maxIdleTime string
+	}
 }
 
 type application struct {
@@ -28,17 +35,13 @@ func main() {
 	flag.IntVar(&cfg.port, "port", 4000, "API server port")
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development|staging|production)")
 	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("GREENLIGHT_DB_DSN"), "PostgreSQL DSN")
-	flag.IntVar(&cfg.db.maxOpenConns, "db-max-open-conns", 25, "PostgreSQL max open connections")
-	flag.IntVar(&cfg.db.maxIdleConns, "db-max-idle-conns", 25, "PostgreSQL max idle connections")
-	flag.StringVar(&cfg.db.maxIdleTime, "db-max-idle-time", "15m", "PostgreSQL max connection idle time")
+	flag.IntVar(&cfg.db.maxConns, "db-max-open-conns", 25, "PostgreSQL max open connections")
 	flag.Parse()
-	// Initialize a new jsonlog.Logger which writes any messages *at or above* the INFO
-	// severity level to the standard out stream.
+
 	logger := jsonlog.New(os.Stdout, jsonlog.LevelInfo)
 
 	db, err := openDB(cfg)
 	if err != nil {
-
 		logger.PrintFatal(err, nil)
 	}
 	defer db.Close()
@@ -64,4 +67,39 @@ func main() {
 	err = srv.ListenAndServe()
 
 	logger.PrintFatal(err, nil)
+}
+
+func openDB(cfg config) (*pgxpool.Pool, error) {
+	poolCfg, err := configurePool(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	conn, err := pgxpool.NewWithConfig(context.Background(), poolCfg)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err = conn.Ping(ctx); err != nil {
+		return nil, err
+	}
+
+	return conn, nil
+}
+
+func configurePool(cfg config) (*pgxpool.Config, error) {
+	poolCfg, err := pgxpool.ParseConfig(cfg.db.dsn)
+	if err != nil {
+		return nil, err
+	}
+	poolCfg.MaxConns = int32(cfg.db.maxConns)
+	duration, err := time.ParseDuration(cfg.db.maxIdleTime)
+	if err != nil {
+		return nil, err
+	}
+	poolCfg.MaxConnIdleTime = duration
+	return poolCfg, nil
 }
