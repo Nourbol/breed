@@ -12,9 +12,9 @@ var (
 
 type Models struct {
 	Breeds interface {
-		Insert(movie *Breed) error
+		Insert(breed *Breed) error
 		Get(id int64) (*Breed, error)
-		Update(movie *Breed) error
+		Update(breed *Breed) error
 		Delete(id int64) error
 		GetAll(title string, genres []string, filters Filters) ([]*Breed, Metadata, error)
 	}

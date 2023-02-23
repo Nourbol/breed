@@ -32,8 +32,9 @@ func main() {
 	var cfg config
 	flag.IntVar(&cfg.port, "port", 4000, "API server port")
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development|staging|production)")
-	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("GREENLIGHT_DB_DSN"), "PostgreSQL DSN")
+	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("BREED_DB_DSN"), "PostgreSQL DSN")
 	flag.IntVar(&cfg.db.maxConns, "db-max-open-conns", 25, "PostgreSQL max open connections")
+	flag.StringVar(&cfg.db.maxIdleTime, "db-max-idle-time", "15m", "PostgreSQL max connection idle time")
 	flag.Parse()
 
 	logger := jsonlog.New(os.Stdout, jsonlog.LevelInfo)
@@ -43,8 +44,8 @@ func main() {
 		logger.PrintFatal(err, nil)
 	}
 	defer db.Close()
-
 	logger.PrintInfo("database connection pool established", nil)
+
 	app := &application{
 		config: cfg,
 		logger: logger,

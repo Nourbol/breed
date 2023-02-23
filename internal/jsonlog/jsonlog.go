@@ -9,14 +9,13 @@ import (
 	"time"
 )
 
-// Define a Level type to represent the severity level for a log entry.
 type Level int8
 
 const (
-	LevelInfo  Level = iota // Has the value 0.
-	LevelError              // Has the value 1.
-	LevelFatal              // Has the value 2.
-	LevelOff                // Has the value 3.
+	LevelInfo Level = iota
+	LevelError
+	LevelFatal
+	LevelOff
 )
 
 func (l Level) String() string {
@@ -59,7 +58,6 @@ func (l *Logger) PrintFatal(err error, properties map[string]string) {
 func (l *Logger) print(level Level, message string, properties map[string]string) (int, error) {
 
 	if level < l.minLevel {
-		return 0, nil
 		return 0, nil
 	}
 

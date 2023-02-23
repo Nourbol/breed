@@ -179,12 +179,12 @@ func (app *application) listBreedsHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	movies, metadata, err := app.models.Breeds.GetAll(input.Name, input.Countries, input.Filters)
+	breeds, metadata, err := app.models.Breeds.GetAll(input.Name, input.Countries, input.Filters)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
-	if err = app.writeJSON(w, http.StatusOK, envelope{"movies": movies, "metadata": metadata}, nil); err != nil {
+	if err = app.writeJSON(w, http.StatusOK, envelope{"breeds": breeds, "metadata": metadata}, nil); err != nil {
 		app.serverErrorResponse(w, r, err)
 	}
 }
