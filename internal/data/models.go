@@ -23,11 +23,13 @@ type Models struct {
 		GetByEmail(email string) (*User, error)
 		Update(user *User) error
 	}
+	Tokens TokenModel
 }
 
 func NewModels(db *pgxpool.Pool) Models {
 	return Models{
 		Breeds: BreedModel{DB: db},
 		Users:  UserModel{DB: db},
+		Tokens: TokenModel{DB: db},
 	}
 }
