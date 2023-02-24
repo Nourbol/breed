@@ -2,10 +2,8 @@ package data
 
 import (
 	"context"
-	"database/sql"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"time"
-
-	"github.com/lib/pq"
 )
 
 type Permissions []string
@@ -20,19 +18,19 @@ func (p Permissions) Include(code string) bool {
 }
 
 type PermissionModel struct {
-	DB *sql.DB
+	DB *pgxpool.Pool
 }
 
 func (m PermissionModel) GetAllForUser(userID int64) (Permissions, error) {
 	query := `
-SELECT permissions.code
-FROM permissions
-INNER JOIN users_permissions ON users_permissions.permission_id = permissions.id
-INNER JOIN users ON users_permissions.user_id = users.id
-WHERE users.id = $1`
+		SELECT permissions.code
+		FROM permissions
+		INNER JOIN users_permissions ON users_permissions.permission_id = permissions.id
+		INNER JOIN users ON users_permissions.user_id = users.id
+		WHERE users.id = $1`
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	rows, err := m.DB.QueryContext(ctx, query, userID)
+	rows, err := m.DB.Query(ctx, query, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -57,6 +55,6 @@ INSERT INTO users_permissions
 SELECT $1, permissions.id FROM permissions WHERE permissions.code = ANY($2)`
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	_, err := m.DB.ExecContext(ctx, query, userID, pq.Array(codes))
+	_, err := m.DB.Exec(ctx, query, userID, codes)
 	return err
 }

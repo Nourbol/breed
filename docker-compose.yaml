@@ -9,7 +9,8 @@ services:
     depends_on:
       - db
     entrypoint: [ "go", "run", "./cmd/api",
-                  "-db-dsn=postgres://${DB_ROOT_USER}:${DB_ROOT_PASS}@db/breed" ]
+                  "-db-dsn=postgres://${DB_ROOT_USER}:${DB_ROOT_PASS}@db/breed",
+                  "-smtp-password=A5041145652"]
 
   db:
     image: postgres:13.5
