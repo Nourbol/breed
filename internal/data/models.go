@@ -3,6 +3,7 @@ package data
 import (
 	"errors"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"time"
 )
 
 var (
@@ -22,8 +23,13 @@ type Models struct {
 		Insert(user *User) error
 		GetByEmail(email string) (*User, error)
 		Update(user *User) error
+		GetForToken(tokenScope, tokenPlaintext string) (*User, error)
 	}
-	Tokens TokenModel
+	Tokens interface {
+		New(userID int64, ttl time.Duration, scope string) (*Token, error)
+		Insert(token *Token) error
+		DeleteAllForUser(scope string, userID int64) error
+	}
 }
 
 func NewModels(db *pgxpool.Pool) Models {

@@ -4,9 +4,9 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/sha256"
-	"database/sql"
 	"encoding/base32"
 	"github.com/Nourbol/breed/internal/validator"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"time"
 )
 
@@ -51,7 +51,7 @@ func ValidateTokenPlaintext(v *validator.Validator, tokenPlaintext string) {
 }
 
 type TokenModel struct {
-	DB *sql.DB
+	DB *pgxpool.Pool
 }
 
 func (m TokenModel) New(userID int64, ttl time.Duration, scope string) (*Token, error) {
@@ -70,7 +70,7 @@ func (m TokenModel) Insert(token *Token) error {
 	args := []any{token.Hash, token.UserID, token.Expiry, token.Scope}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	_, err := m.DB.ExecContext(ctx, query, args...)
+	_, err := m.DB.Exec(ctx, query, args...)
 	return err
 }
 
@@ -80,6 +80,6 @@ func (m TokenModel) DeleteAllForUser(scope string, userID int64) error {
 		WHERE scope = $1 AND user_id = $2`
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	_, err := m.DB.ExecContext(ctx, query, scope, userID)
+	_, err := m.DB.Exec(ctx, query, scope, userID)
 	return err
 }
