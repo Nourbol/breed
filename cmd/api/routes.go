@@ -12,12 +12,12 @@ func (app *application) routes() http.Handler {
 
 	router.MethodNotAllowed = http.HandlerFunc(app.methodNotAllowedResponse)
 
-	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler)
-	router.HandlerFunc(http.MethodPost, "/v1/breeds", app.createBreedHandler)
-	router.HandlerFunc(http.MethodGet, "/v1/breeds/:id", app.showBreedHandler)
-	router.HandlerFunc(http.MethodGet, "/v1/breeds", app.listBreedsHandler)
-	router.HandlerFunc(http.MethodPatch, "/v1/breeds/:id", app.updateBreedHandler)
-	router.HandlerFunc(http.MethodDelete, "/v1/breeds/:id", app.deleteBreedHandler)
+	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.requirePermission("breeds: read", app.healthcheckHandler))
+	router.HandlerFunc(http.MethodPost, "/v1/breeds", app.requirePermission("breeds: write", app.createBreedHandler))
+	router.HandlerFunc(http.MethodGet, "/v1/breeds/:id", app.requirePermission("breeds: read", app.showBreedHandler))
+	router.HandlerFunc(http.MethodGet, "/v1/breeds", app.requirePermission("breeds: read", app.listBreedsHandler))
+	router.HandlerFunc(http.MethodPatch, "/v1/breeds/:id", app.requirePermission("breeds: write", app.updateBreedHandler))
+	router.HandlerFunc(http.MethodDelete, "/v1/breeds/:id", app.requirePermission("breeds: write", app.deleteBreedHandler))
 
 	router.HandlerFunc(http.MethodPost, "/v1/users", app.registerUserHandler)
 

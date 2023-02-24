@@ -12,7 +12,8 @@ var (
 )
 
 type Models struct {
-	Breeds interface {
+	Permissions PermissionModel
+	Breeds      interface {
 		Insert(breed *Breed) error
 		Get(id int64) (*Breed, error)
 		Update(breed *Breed) error
@@ -34,8 +35,9 @@ type Models struct {
 
 func NewModels(db *pgxpool.Pool) Models {
 	return Models{
-		Breeds: BreedModel{DB: db},
-		Users:  UserModel{DB: db},
-		Tokens: TokenModel{DB: db},
+		Breeds:      BreedModel{DB: db},
+		Permissions: PermissionModel{DB: db},
+		Users:       UserModel{DB: db},
+		Tokens:      TokenModel{DB: db},
 	}
 }
